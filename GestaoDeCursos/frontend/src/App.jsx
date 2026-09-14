@@ -7,16 +7,23 @@ function App() {
 
   return (
     <>
- 
-        <div id="footer">
-          <h1 className="footer-title">Gestão Rapida</h1>
+      <section id="header">
+        <div className="header-content">
+          <h1 className="header-title">Gestão Rapida</h1>
+          <p className="header-subtitle">Gerencie seus cursos de forma rápida e eficiente.</p>
+         <div id="footer">
             <div className="footer-links">
               <a href="./pages/public/Contato.jsx">Contato</a>
               <a href="./pages/public/Cursos.jsx">Cursos</a>
               <a href="./pages/public/Sobre.jsx">Sobre</a>
             </div>
             <SearchBar/>    
+        </div>      
+      
         </div>
+
+      </section>
+       
         
 
  
