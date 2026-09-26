@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Gestão de cursos com autenticação e permissões por perfil.">
+  <meta name="theme-color" content="#f7f8f5">
+  <title>Gestão de Cursos | Área acadêmica</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js" defer></script>
+</head>
+
+<body>
+  <div class="site-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Gestão de Cursos — início">
+        <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none">
+            <path d="M5 10.5 16 5l11 5.5L16 16 5 10.5Z" />
+            <path d="M9 13v7.3c0 1.8 3.1 3.7 7 3.7s7-1.9 7-3.7V13" />
+            <path d="M27 11v8" />
+          </svg></span>
+        <span class="brand-name">trilha<span>.</span><small>GESTÃO ACADÊMICA</small></span>
+      </a>
+      <div class="topbar-right">
+        <span id="status-conexao" class="connection-pill"><i></i><span>Verificando acesso</span></span>
+        <div id="sessao-resumo" class="session-summary oculto">
+          <span class="avatar" id="avatar-usuario">U</span>
+          <span class="session-user"><strong id="usuario-atual"></strong><small id="papel-atual"
+              class="role-badge"></small></span>
+          <button id="btn-sair" class="button button-quiet button-small" type="button">Sair <span
+              aria-hidden="true">↗</span></button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <p id="mensagem-global" class="message-banner" role="status" aria-live="polite"></p>
+
+      <section id="tela-auth" class="auth-layout">
+        <div class="auth-copy">
+          <span class="eyebrow"><i></i> ESPAÇO DE APRENDIZAGEM</span>
+          <h1>Aprender abre<br>novos <span>caminhos.</span></h1>
+          <p class="auth-lede">Entre na sua área para acompanhar cursos, matrículas e tudo o que vem pela frente.</p>
+          <div class="auth-proof"><span class="proof-icon" aria-hidden="true">✓</span><span><strong>Acesso
+                seguro</strong><small>Suas informações protegidas em cada etapa.</small></span></div>
+          <div class="auth-decoration" aria-hidden="true"><span class="orbit orbit-one"></span><span
+              class="orbit orbit-two"></span><span class="spark spark-one">✳</span><span
+              class="spark spark-two">✳</span><span class="deco-card deco-card-one"><i>◒</i><span>conhecimento em
+                movimento</span></span><span class="deco-card deco-card-two"><b>01</b><span>uma trilha de cada
+                vez</span></span></div>
+          <p class="auth-footnote">ENCONTRO 02 <span>·</span> AUTENTICAÇÃO + SEGURANÇA</p>
+        </div>
+
+        <article class="auth-card">
+          <div class="auth-card-top">
+            <div class="auth-lock" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none">
+                <rect x="4.5" y="10" width="15" height="11" rx="2.5" />
+                <path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3" />
+              </svg></div><span class="secure-label">AMBIENTE PROTEGIDO</span>
+          </div>
+          <div class="auth-heading">
+            <h2 id="titulo-auth">Boas-vindas de volta</h2>
+            <p id="ajuda-auth">Entre com seus dados para continuar.</p>
+          </div>
+          <div class="auth-tabs" role="tablist" aria-label="Acesso à plataforma">
+            <button id="aba-login" class="tab ativa" type="button" role="tab" aria-selected="true">Entrar</button>
+            <button id="aba-cadastro" class="tab" type="button" role="tab" aria-selected="false">Criar conta</button>
+          </div>
+          <form id="form-auth" class="form-stack">
+            <div id="campo-nome-wrap" class="field oculto"><label for="auth-nome">Nome completo</label><input
+                id="auth-nome" autocomplete="name" minlength="3" placeholder="Como podemos chamar você?"></div>
+            <div class="field"><label for="auth-email">E-mail</label><input id="auth-email" type="email" required
+                autocomplete="email" placeholder="voce@email.com"></div>
+            <div class="field">
+              <div class="field-heading"><label for="auth-senha">Senha</label><span class="field-hint">Mínimo de 6
+                  caracteres</span></div><input id="auth-senha" type="password" required minlength="6"
+                autocomplete="current-password" placeholder="Digite sua senha">
+            </div>
+            <button id="btn-auth-submit" class="button button-primary button-full" type="submit">Entrar na plataforma
+              <span aria-hidden="true">→</span></button>
+          </form>
+          <div class="auth-divider"><span></span><small>SEU ESPAÇO, DO SEU JEITO</small><span></span></div>
+          <p class="auth-note">Ao criar uma conta, seu perfil começa como <strong>aluno</strong>. Um administrador pode
+            atualizar essa função depois.</p>
+        </article>
+      </section>
+
+      <section id="painel" class="dashboard oculto">
+        <div class="dashboard-heading">
+          <div><span class="eyebrow"><i></i> SUA ÁREA DE APRENDIZAGEM</span>
+            <h1 id="boas-vindas">Olá</h1>
+            <p id="descricao-papel" class="dashboard-subtitle"></p>
+          </div>
+          <div class="heading-actions"><span class="date-chip"><span aria-hidden="true">◷</span> Aprenda no seu
+              ritmo</span></div>
+        </div>
+
+        <div class="stats-grid" aria-label="Resumo da conta">
+          <article class="stat-card stat-card-courses"><span class="stat-icon icon-blue" aria-hidden="true">▤</span>
+            <div><small>Cursos visíveis</small><strong id="numero-cursos">—</strong>
+              <p id="texto-cursos">Disponíveis para você</p>
+            </div><span class="stat-decoration" aria-hidden="true">↗</span>
+          </article>
+          <article class="stat-card"><span class="stat-icon icon-green" aria-hidden="true">✓</span>
+            <div><small>Seu perfil</small><strong id="resumo-papel">—</strong>
+              <p>Permissões aplicadas no banco</p>
+            </div>
+          </article>
+          <article class="stat-card"><span class="stat-icon icon-amber" aria-hidden="true">⌑</span>
+            <div><small>Sessão</small><strong class="stat-session">Protegida</strong>
+              <p>Conexão autenticada</p>
+            </div><span class="live-dot" aria-label="Ativa"></span>
+          </article>
+        </div>
+
+        <div id="bloco-cursos" class="workspace-grid">
+          <article id="card-gerenciar-curso" class="panel-card course-editor oculto">
+            <div class="panel-heading">
+              <div><span class="section-kicker">ÁREA DO PROFESSOR</span>
+                <h2 id="titulo-curso-form">Novo curso</h2>
+              </div><span class="heading-mark" aria-hidden="true">＋</span>
+            </div>
+            <form id="form-curso" class="form-stack compact-form">
+              <input type="hidden" id="curso-id">
+              <div class="field"><label for="curso-nome">Nome do curso</label><input id="curso-nome" required
+                  maxlength="120" placeholder="Ex.: PostgreSQL básico"></div>
+              <div class="field"><label for="curso-descricao">Descrição</label><textarea id="curso-descricao" rows="3"
+                  placeholder="O que os alunos vão aprender?"></textarea></div>
+              <div class="field"><label for="curso-carga">Carga horária</label>
+                <div class="input-suffix"><input id="curso-carga" type="number" min="1" max="10000" required
+                    value="20"><span>horas</span></div>
+              </div>
+              <div id="campo-professor-wrap" class="field oculto"><label for="curso-professor">Professor
+                  responsável</label><select id="curso-professor"></select></div>
+              <label class="switch-row"><input id="curso-ativo" type="checkbox" checked><span
+                  class="switch-ui"></span><span><strong>Curso disponível</strong><small>Visível para
+                    alunos</small></span></label>
+              <div class="form-actions"><button class="button button-primary" type="submit">Salvar curso <span
+                    aria-hidden="true">→</span></button><button id="btn-cancelar-curso"
+                  class="button button-quiet oculto" type="button">Cancelar</button></div>
+            </form>
+          </article>
+
+          <article class="panel-card courses-panel">
+            <div class="panel-heading courses-heading">
+              <div><span class="section-kicker">CATÁLOGO</span>
+                <h2>Cursos e trilhas</h2>
+                <p>Encontre seu próximo passo.</p>
+              </div><button id="btn-novo-curso" class="button button-primary new-course-button oculto"
+                type="button"><span aria-hidden="true">＋</span> Novo curso</button>
+            </div>
+            <div class="catalog-toolbar"><label class="search-box" for="buscar-cursos"><svg viewBox="0 0 24 24"
+                  fill="none" aria-hidden="true">
+                  <circle cx="10.8" cy="10.8" r="6.8" />
+                  <path d="m16 16 4.5 4.5" />
+                </svg><input id="buscar-cursos" type="search" placeholder="Buscar um curso..."></label><select
+                id="filtro-curso-status" class="filter-select" aria-label="Filtrar cursos por status">
+                <option value="todos">Todos os cursos</option>
+                <option value="ativos">Disponíveis</option>
+                <option value="inativos">Indisponíveis</option>
+              </select><button id="btn-atualizar" class="icon-button" type="button" aria-label="Atualizar cursos"
+                title="Atualizar cursos"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M20 7v5h-5M4 17v-5h5" />
+                  <path d="M6.1 9a7 7 0 0 1 11.5-2L20 12M4 12l2.4 5a7 7 0 0 0 11.5-2" />
+                </svg></button></div>
+            <div id="lista-cursos" class="course-list">
+              <p class="course-empty">Carregando cursos...</p>
+            </div>
+          </article>
+        </div>
+
+        <article id="card-matriculas" class="panel-card lower-panel oculto">
+          <div class="panel-heading">
+            <div><span class="section-kicker">SEU PROGRESSO</span>
+              <h2>Minhas matrículas</h2>
+              <p>Acompanhe as trilhas em que você está inscrito.</p>
+            </div><span class="heading-mark heading-mark-green" aria-hidden="true">✓</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Curso</th>
+                  <th>Status</th>
+                  <th>Data de matrícula</th>
+                </tr>
+              </thead>
+              <tbody id="tabela-matriculas">
+                <tr>
+                  <td colspan="3">Carregando...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+
+        <article id="card-usuarios" class="panel-card lower-panel oculto">
+          <div class="panel-heading">
+            <div><span class="section-kicker">ADMINISTRAÇÃO</span>
+              <h2>Contas e perfis</h2>
+              <p>Gerencie papéis de usuários. Sua própria conta permanece protegida.</p>
+            </div><span class="heading-mark heading-mark-purple" aria-hidden="true">♙</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>UUID do usuário</th>
+                  <th>Perfil</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody id="tabela-usuarios">
+                <tr>
+                  <td colspan="4">Carregando...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="site-footer"><a class="footer-brand" href="#"><span class="brand-mark"
+          aria-hidden="true">t.</span><span>trilha.</span></a><span>ENCONTRO 02 <i>·</i> IDENTIDADE E SEGURANÇA</span><a
+        href="../docs/relatorio_encontro_02.md">Relatório + matriz de permissões <span aria-hidden="true">↗</span></a>
+    </footer>
+  </div>
+</body>
+
+</html>
